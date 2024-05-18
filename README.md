@@ -1,3 +1,3 @@
 ### FrJoy
 
-`FrJoy` simply means  `For React Joy` or you can through in my name Felix for fun 😂
+`FrJoy` simply means  `For React Joy` or you can throw in my name `Felix` for fun 😂
