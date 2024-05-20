@@ -1,6 +1,6 @@
 {
   "name": "@frjoy/otp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "",
   "source": "./src/index.ts",
   "main": "./dist/index.js",
@@ -10,7 +10,12 @@
     "clean": "rm -rf dist",
     "version": "pnpm version"
   },
-  "keywords": ["otp", "react", "typescript","frjoy"],
+  "keywords": [
+    "otp",
+    "react",
+    "typescript",
+    "frjoy"
+  ],
   "author": "Felix Dusengimana <info@feldux.com>",
   "license": "ISC",
   "peerDependencies": {
