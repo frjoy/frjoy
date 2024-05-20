@@ -33,6 +33,7 @@
 ### Props supported
 
 1. `Root`
+
 | Prop | Data Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
 | children | React.ReactNode | - | - | Add custom children to the root element |
@@ -53,14 +54,3 @@ It also accepts the following props
 | --- | --- | --- | --- | --- |
 | length | number | 1 | - | Define the number of character that a user can type in an input |
 | password | boolean | false | - | Define if the input should be a password field |
-
-
-
-# Changelog
-
-### 0.1.0 (2024-20-May)
-- Initial release
-
-### 0.1.1 (2024-20-May)
-- Omitting the `type` prop from the `Input` component
-- Omitting the `htmlFor` prop from the `Label` component
