@@ -16,7 +16,14 @@ export interface InputProps
 
 function Input(props: InputProps) {
   const id = React.useId();
-  const { password: pass, length = 1, ...rest } = props;
+  const {
+    password: pass,
+    length = 1,
+    onChange,
+    onKeyDown,
+    onPaste: ps,
+    ...rest
+  } = props;
   const {
     addRef,
     password,
@@ -31,9 +38,18 @@ function Input(props: InputProps) {
     <input
       {...rest}
       data-type={type}
-      onKeyDown={handleKeyDown}
-      onChange={onInputChange}
-      onPaste={onPaste}
+      onKeyDown={(e) => {
+        handleKeyDown(e);
+        onKeyDown && onKeyDown(e);
+      }}
+      onChange={(e) => {
+        onInputChange(e);
+        onChange && onChange(e);
+      }}
+      onPaste={(e) => {
+        onPaste(e);
+        ps && ps(e);
+      }}
       value={otp[OTP_UNIQUE_PREFIX_ID + id] || ""}
       pattern={rest.pattern ?? pattern}
       id={OTP_UNIQUE_PREFIX_ID + id}
@@ -46,7 +62,8 @@ function Input(props: InputProps) {
   );
 }
 
-export interface LabelProps extends React.ComponentProps<"label"> {}
+export interface LabelProps
+  extends Omit<React.ComponentProps<"label">, "htmlFor" | "for"> {}
 const Label = ({ children, ...props }: LabelProps) => {
   const { refs, otp } = useOtpContext();
   const otpText = Object.values(otp).join("");

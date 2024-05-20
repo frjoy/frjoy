@@ -7,7 +7,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist && find . -type d -name '__snapshots__' -exec rm -rf {} +",
     "version": "pnpm version"
   },
   "keywords": [
@@ -17,7 +17,7 @@
     "frjoy"
   ],
   "author": "Felix Dusengimana <info@feldux.com>",
-  "license": "ISC",
+  "license": "MIT",
   "peerDependencies": {
     "@types/react": "*",
     "@types/react-dom": "*",
