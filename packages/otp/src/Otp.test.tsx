@@ -5,8 +5,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { Root, Input, Label } from "./Otp";
 
 describe("OTP Component", (test) => {
-  test("should render the OTP component", () => {
-    const { container } = render(
+  test("should render the OTP component", async () => {
+    const container = render(
       <Root>
         <Label>OTP</Label>
         <Input />
@@ -16,10 +16,22 @@ describe("OTP Component", (test) => {
       </Root>
     );
 
-    const inputEl = screen.findByRole("textbox");
-    expect(container).toMatchSnapshot();
+    const inputEls = (await container.findAllByRole(
+      "textbox"
+    )) as HTMLInputElement[];
 
-    expect(inputEl).toBeDefined();
+    // check if 4 input fields are rendered
+    expect(inputEls).toHaveLength(4);
+
+    // check if all input fields are empty
+    inputEls.map((inputEl) => {
+      expect(inputEl.value).toBe("");
+    });
+
+    // check if label is rendered
+
+    const labelEl = container.getByText("OTP");
+    expect(labelEl).toBeDefined();
   });
 
   test("handles onChange event", async () => {

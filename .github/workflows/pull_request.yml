@@ -33,3 +33,4 @@ jobs:
         run: pnpm test
         env:
           FORCE_COLOR: true
+          VITE_CJS_IGNORE_WARNING: true
