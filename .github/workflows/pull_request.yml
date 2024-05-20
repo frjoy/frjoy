@@ -27,7 +27,7 @@ jobs:
           version: 8
 
       - name: Install Dependencies
-        run: pnpm -r install
+        run: pnpm -r install --frozen-lockfile
 
       - name: Test
         run: pnpm test
