@@ -12,7 +12,7 @@
     "test:coverage": "vitest --coverage",
     "build:package": "parcel build 'packages/*/' --no-cache",
     "build:fix-type-defs": "node ./scripts/fix-type-defs-imports",
-    "publish": "pnpm build:package && changeset publish",
+    "release": "pnpm build:package && changeset publish",
     "clean": "pnpm  -r clean",
     "reset": "pnpm clean && rm -rf node_modules .parcel-cache",
     "bump:stable": "pnpm version -r",
