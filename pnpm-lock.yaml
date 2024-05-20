@@ -56,9 +56,6 @@ importers:
       '@types/fs-extra':
         specifier: ^11.0.4
         version: 11.0.4
-      bump:
-        specifier: ^0.2.5
-        version: 0.2.5
       fs-extra:
         specifier: ^11.2.0
         version: 11.2.0
@@ -5166,11 +5163,6 @@ packages:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
-    dev: true
-
-  /bump@0.2.5:
-    resolution: {integrity: sha512-d4CZYvcP317+twjo7PhGd+EptYjvw83itgaxbJtJnHE64qH29qMtqAQ5vb3x3Su7WuaPjow88GBgp0FDBxbm8w==}
-    hasBin: true
     dev: true
 
   /bytes@3.0.0:

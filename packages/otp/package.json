@@ -17,7 +17,7 @@
     "frjoy"
   ],
   "author": "Felix Dusengimana <info@feldux.com>",
-  "license": "ISC",
+  "license": "MIT",
   "peerDependencies": {
     "@types/react": "*",
     "@types/react-dom": "*",
