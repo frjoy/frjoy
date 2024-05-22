@@ -13,10 +13,13 @@
     "test:coverage": "vitest --coverage",
     "build:package": "parcel build 'packages/*/' --no-cache",
     "build:fix-type-defs": "node ./scripts/fix-type-defs-imports",
-    "release": "pnpm build:package && changeset publish",
+    "version": "pnpm changeset version",
     "clean": "pnpm  -r clean",
     "reset": "pnpm clean && rm -rf node_modules .parcel-cache",
-    "changeset:version": "changeset version && rm -rf .changeset/*.md"
+    "changeset:version": "changeset version && rm -rf .changeset/*.md",
+    "release": "pnpm build:package && changeset publish",
+    "version:dev": "pnpm changeset version --snapshot dev",
+    "release:dev": "pnpm changeset publish --tag dev"
   },
   "keywords": [],
   "author": "Felix Dusengimana <info@feldux.com>",
