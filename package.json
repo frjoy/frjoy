@@ -16,8 +16,7 @@
     "release": "pnpm build:package && changeset publish",
     "clean": "pnpm  -r clean",
     "reset": "pnpm clean && rm -rf node_modules .parcel-cache",
-    "changeset:version": "changeset version && pnpm copy:changelog && rm -rf .changeset/*.md",
-    "copy:changelog": "rimraf .storybook/docs/CHANGELOG.mdx && copyfiles CHANGELOG.md  .storybook/docs && rename .storybook/docs/CHANGELOG.md CHANGELOG.mdx && rimraf .storybook/docs/CHANGELOG.md"
+    "changeset:version": "changeset version && rm -rf .changeset/*.md"
   },
   "keywords": [],
   "author": "Felix Dusengimana <info@feldux.com>",
