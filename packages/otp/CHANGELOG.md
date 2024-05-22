@@ -1,5 +1,13 @@
 # @frjoy/otp
 
+## 0.1.4
+
+### Patch Changes
+
+- 5f42d62: publish only dist folder
+- 5f42d62: update readme.md and also publish dist/ folder only
+- 5f42d62: fix readme
+
 ## 0.1.3
 
 ### Patch Changes
