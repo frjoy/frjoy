@@ -1,8 +1,24 @@
 ### Easily customizable OTP
 
-### Usage 
+### How to install
 
+```bash
+npm install @react-otp/core
 ```
+  
+```bash
+yarn add @react-otp/core
+```
+
+```bash
+pnpm add @react-otp/core
+```
+
+### How to use
+
+```jsx
+import * as OTP from '@frjoy/otp';
+
 <OTP.Root>
 <OTP.Label >This label allows you to be able to access fist empty otp input</OTP.Label>
 <OTP.Input />
