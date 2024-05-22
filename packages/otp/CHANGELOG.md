@@ -4,6 +4,15 @@
 
 ### Patch Changes
 
+- 8ceb6a5: fix:readme
+- 9031dc1: publish only dist folder
+- 8ceb6a5: remove certain types from controlled component
+- 8ceb6a5: ignore src folder from being published
+
+## 0.1.2
+
+### Patch Changes
+
 - 2c51a8c: fix:readme
 - 225af63: remove certain types from controlled component
 
