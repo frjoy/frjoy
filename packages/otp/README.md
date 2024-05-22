@@ -3,15 +3,15 @@
 ### How to install
 
 ```bash
-npm install @react-otp/core
+npm install @frjoy/otp
 ```
   
 ```bash
-yarn add @react-otp/core
+yarn add @frjoy/otp
 ```
 
 ```bash
-pnpm add @react-otp/core
+pnpm add @frjoy/otp
 ```
 
 ### How to use
