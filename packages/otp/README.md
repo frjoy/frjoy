@@ -24,7 +24,7 @@ import * as OTP from '@frjoy/otp';
 <OTP.Input />
 <OTP.Input />
 <OTP.Input />
-<!-- Define as many as input as you wants -->
+<!-- Define as many input as you wants -->
 </OTP.Root>
 ```
 

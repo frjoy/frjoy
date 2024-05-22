@@ -4,7 +4,7 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
+        "types": "./dist/index.d.ts",
         "default": "./dist/index.mjs"
       },
       "require": {
@@ -14,7 +14,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "sideEffects": false,
   "source": "./src/index.ts",
@@ -22,7 +23,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "clean": "rm -rf dist && find . -type d -name '__snapshots__' -exec rm -rf {} +",
+    "clean": "rm -rf dist && rm -rf node_modules && find . -type d -name '__snapshots__' -exec rm -rf {} +",
     "version": "pnpm version"
   },
   "keywords": [

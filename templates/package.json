@@ -6,10 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf dist && rm -rf node_modules && find . -type d -name '__snapshots__' -exec rm -rf {} +"
   },
   "dependencies": {
-    "@frjoy/otp": "^0.1.0",
+    "@frjoy/otp": "^0.1.4",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"
