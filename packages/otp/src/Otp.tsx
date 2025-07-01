@@ -12,6 +12,7 @@ export interface InputProps
   > {
   password?: boolean;
   length?: number;
+  "aria-label"?: string;
 }
 
 function Input(props: InputProps) {
@@ -22,6 +23,7 @@ function Input(props: InputProps) {
     onChange,
     onKeyDown,
     onPaste: ps,
+    "aria-label": ariaLabelProp,
     ...rest
   } = props;
   const {
@@ -34,10 +36,20 @@ function Input(props: InputProps) {
     handleKeyDown,
     pattern,
   } = useOtpContext();
+
+  // Accessible label for each input, fallback to generic label if none provided
+  const ariaLabel = ariaLabelProp || `Digit input`;
+
+  // Set inputmode for better mobile keyboard
+  const inputMode =
+    type === "number" ? "numeric" : type === "text" ? "text" : undefined;
+
   return (
     <input
       {...rest}
+      aria-label={ariaLabel}
       data-type={type}
+      inputMode={inputMode}
       onKeyDown={(e) => {
         handleKeyDown(e);
         onKeyDown && onKeyDown(e);
@@ -57,13 +69,16 @@ function Input(props: InputProps) {
       type={pass || password ? "password" : "text"}
       autoComplete="off"
       maxLength={length}
-      minLength={length}
+      aria-required="true"
+      aria-invalid={false} // Extend to dynamic if you add validation states
+      className="otp-input"
     />
   );
 }
 
 export interface LabelProps
   extends Omit<React.ComponentProps<"label">, "htmlFor" | "for"> {}
+
 const Label = ({ children, ...props }: LabelProps) => {
   const { refs, otp } = useOtpContext();
   const otpText = Object.values(otp).join("");
@@ -91,7 +106,7 @@ const Label = ({ children, ...props }: LabelProps) => {
   }, [otpText, refs.length]);
 
   return (
-    <label {...props} htmlFor={lastNotFull}>
+    <label {...props} htmlFor={lastNotFull} id="otp-label">
       {children}
     </label>
   );
@@ -233,7 +248,10 @@ function Root({
         pattern,
       }}
     >
-      {children}
+      {/* Group inputs with accessible label */}
+      <div role="group" aria-labelledby="otp-label">
+        {children}
+      </div>
     </OtpContext.Provider>
   );
 }
