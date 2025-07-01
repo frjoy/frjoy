@@ -1,10 +1,10 @@
 import React from "react";
-import { describe, expect, vitest } from "vitest";
+import { describe, expect, vitest, test } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
 import { Root, Input, Label } from "./Otp";
 
-describe("OTP Component", (test) => {
+describe("OTP Component", () => {
   test("should render the OTP component", async () => {
     const container = render(
       <Root>
@@ -24,12 +24,11 @@ describe("OTP Component", (test) => {
     expect(inputEls).toHaveLength(4);
 
     // check if all input fields are empty
-    inputEls.map((inputEl) => {
+    inputEls.forEach((inputEl) => {
       expect(inputEl.value).toBe("");
     });
 
     // check if label is rendered
-
     const labelEl = container.getByText("OTP");
     expect(labelEl).toBeDefined();
   });
@@ -46,11 +45,12 @@ describe("OTP Component", (test) => {
       </Root>
     );
 
-    const inputEls = await screen.findAllByRole("textbox");
-    inputEls.map((inputEl, index) => {
-      fireEvent.change(inputEl, { target: { value: index } });
+    const inputEls = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    inputEls.forEach((inputEl, index) => {
+      fireEvent.change(inputEl, { target: { value: index.toString() } });
     });
-    expect(fn).toHaveBeenCalledTimes(5);
+    // Called once for each change
+    expect(fn).toHaveBeenCalledTimes(4);
   });
 
   test("should render the label with for value equal to the input id", () => {
@@ -61,8 +61,103 @@ describe("OTP Component", (test) => {
       </Root>
     );
     const labelEl = container.getByTitle("OTP Label");
-    const inputEls = container.getByPlaceholderText("Input 1");
+    const inputEl = container.getByPlaceholderText("Input 1");
 
-    expect(labelEl.getAttribute("for")).toBe(inputEls.id);
+    expect(labelEl.getAttribute("for")).toBe(inputEl.id);
+  });
+
+  // --- Additional tests ---
+
+  test("ArrowRight moves focus to next input", async () => {
+    render(
+      <Root>
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    inputs[0].focus();
+    fireEvent.keyDown(inputs[0], { key: "ArrowRight" });
+
+    expect(document.activeElement).toBe(inputs[1]);
+  });
+
+  test("ArrowLeft moves focus to previous input", async () => {
+    render(
+      <Root>
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    inputs[1].focus();
+    fireEvent.keyDown(inputs[1], { key: "ArrowLeft" });
+
+    expect(document.activeElement).toBe(inputs[0]);
+  });
+
+  test("Backspace on empty input moves focus to previous input", async () => {
+    render(
+      <Root>
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+
+    // Fill second input with a value
+    fireEvent.change(inputs[1], { target: { value: "a" } });
+    inputs[1].focus();
+
+    // Clear second input by backspacing to empty
+    fireEvent.keyDown(inputs[1], { key: "Backspace" });
+    fireEvent.change(inputs[1], { target: { value: "" } });
+
+    // After backspace on empty, focus should move to previous input
+    fireEvent.keyDown(inputs[1], { key: "Backspace" });
+
+    expect(document.activeElement).toBe(inputs[0]);
+  });
+
+  test("should populate inputs correctly on paste", async () => {
+    render(
+      <Root type="number">
+        <Input />
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+
+    fireEvent.paste(inputs[0], {
+      clipboardData: { getData: () => "1234" },
+    });
+
+    expect(inputs[0].value).toBe("1");
+    expect(inputs[1].value).toBe("2");
+    expect(inputs[2].value).toBe("3");
+    expect(inputs[3].value).toBe("4");
+  });
+  
+  test("does not call onChange on initial render", async () => {
+    const onChange = vitest.fn();
+
+    render(
+      <Root password={true} onChange={onChange}>
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

@@ -12,7 +12,6 @@ export interface InputProps
   > {
   password?: boolean;
   length?: number;
-  "aria-label"?: string;
 }
 
 function Input(props: InputProps) {
@@ -23,7 +22,6 @@ function Input(props: InputProps) {
     onChange,
     onKeyDown,
     onPaste: ps,
-    "aria-label": ariaLabelProp,
     ...rest
   } = props;
   const {
@@ -36,20 +34,10 @@ function Input(props: InputProps) {
     handleKeyDown,
     pattern,
   } = useOtpContext();
-
-  // Accessible label for each input, fallback to generic label if none provided
-  const ariaLabel = ariaLabelProp || `Digit input`;
-
-  // Set inputmode for better mobile keyboard
-  const inputMode =
-    type === "number" ? "numeric" : type === "text" ? "text" : undefined;
-
   return (
     <input
       {...rest}
-      aria-label={ariaLabel}
       data-type={type}
-      inputMode={inputMode}
       onKeyDown={(e) => {
         handleKeyDown(e);
         onKeyDown && onKeyDown(e);
@@ -69,16 +57,13 @@ function Input(props: InputProps) {
       type={pass || password ? "password" : "text"}
       autoComplete="off"
       maxLength={length}
-      aria-required="true"
-      aria-invalid={false} // Extend to dynamic if you add validation states
-      className="otp-input"
+      minLength={length}
     />
   );
 }
 
 export interface LabelProps
   extends Omit<React.ComponentProps<"label">, "htmlFor" | "for"> {}
-
 const Label = ({ children, ...props }: LabelProps) => {
   const { refs, otp } = useOtpContext();
   const otpText = Object.values(otp).join("");
@@ -105,8 +90,11 @@ const Label = ({ children, ...props }: LabelProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [otpText, refs.length]);
 
+  // Only render htmlFor if lastNotFull is valid
+  const labelProps = Boolean(lastNotFull) ? { htmlFor: lastNotFull } : {};
+  
   return (
-    <label {...props} htmlFor={lastNotFull} id="otp-label">
+    <label {...props} {...labelProps} aria-live="polite" aria-atomic="true">
       {children}
     </label>
   );
@@ -132,7 +120,7 @@ function Root({
   const [otp, setOtp] = React.useState<{ [id: string]: string }>({});
   const refs = React.useRef<OTPInputClass>(new OTPInputClass()).current;
 
-  const isFirstRender = React.useRef(true);
+  const firstRender = React.useRef(true);
 
   const goToNextInput = (currentId: string) => {
     refs.findInputById(currentId)?.next?.value?.focus();
@@ -199,9 +187,14 @@ function Root({
   const onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     let paste = e.clipboardData.getData("text");
-    if (e.currentTarget?.dataset.type === "number" && !isNumber(paste)) return;
-    if (e.currentTarget?.dataset.type === "text" && !isAlphaNumeric(paste))
-      return;
+    const isValid =
+    e.currentTarget?.dataset.type === "number"
+      ? [...paste].every((ch) => isNumber(ch))
+      : e.currentTarget?.dataset.type === "text"
+        ? [...paste].every((ch) => isAlphaNumeric(ch))
+        : true;
+
+    if (!isValid) return;
 
     let current = refs.findInputById(e.currentTarget.id);
     const newData = { ...otp };
@@ -232,11 +225,11 @@ function Root({
   };
 
   React.useEffect(() => {
-    if(isFirstRender.current) {
-      isFirstRender.current = false;
+    // If this is the first render, we don't want to trigger onChange
+    if (firstRender.current) {
+      firstRender.current = false;
       return;
     }
-    // Call onChange only if it's not the first render
     onChange && onChange(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
@@ -255,10 +248,7 @@ function Root({
         pattern,
       }}
     >
-      {/* Group inputs with accessible label */}
-      <div role="group" aria-labelledby="otp-label">
-        {children}
-      </div>
+      {children}
     </OtpContext.Provider>
   );
 }

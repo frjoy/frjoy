@@ -42,6 +42,7 @@
     "@storybook/react-vite": "^8.1.1",
     "@storybook/test": "^8.1.1",
     "@storybook/theming": "^8.1.1",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^15.0.7",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20",
