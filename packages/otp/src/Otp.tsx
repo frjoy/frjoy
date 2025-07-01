@@ -132,6 +132,8 @@ function Root({
   const [otp, setOtp] = React.useState<{ [id: string]: string }>({});
   const refs = React.useRef<OTPInputClass>(new OTPInputClass()).current;
 
+  const isFirstRender = React.useRef(true);
+
   const goToNextInput = (currentId: string) => {
     refs.findInputById(currentId)?.next?.value?.focus();
   };
@@ -230,6 +232,11 @@ function Root({
   };
 
   React.useEffect(() => {
+    if(isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    // Call onChange only if it's not the first render
     onChange && onChange(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
