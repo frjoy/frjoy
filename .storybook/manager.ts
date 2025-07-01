@@ -5,8 +5,7 @@ addons.setConfig({
   theme: create({
     base: "light",
 
-    brandTitle: "Pivot Access UI",
-    brandUrl: "https://www.pivotaccess.com",
-    brandImage: "https://www.pivotaccess.com/img/logo.png",
+    brandTitle: "ForJoy UI",
+    brandUrl: "https://www.feldux.com/packages",
   }),
 });
