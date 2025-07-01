@@ -1,5 +1,11 @@
 # @frjoy/otp
 
+## 0.1.6
+
+### Patch Changes
+
+- dcdaeb7: Prevent onChange from being called on the initial render.
+
 ## 0.1.5
 
 ### Patch Changes
