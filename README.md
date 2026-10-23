@@ -17,7 +17,7 @@ This is a pnpm monorepo. Use Node.js from `.nvmrc` (20.x) and pnpm 10.
 ```bash
 pnpm install
 pnpm dev:storybook   # Storybook on http://localhost:6006
-pnpm dev             # Next.js playground in ./templates
+pnpm dev             # builds packages, then the Next.js playground on http://localhost:3000
 ```
 
 | Command | What it does |
@@ -32,31 +32,14 @@ pnpm dev             # Next.js playground in ./templates
 
 ```
 packages/     published packages (one folder each)
-templates/    Next.js app for trying packages locally
+templates/    Next.js playground that uses the local packages
 .storybook/   Storybook config
 .changeset/   pending release notes
 ```
 
 ## Contributing
 
-Contributions are welcome. Bug reports, ideas and pull requests all help.
-
-1. Fork the repo and create a branch from `main`.
-2. Make your change and add tests for it.
-3. Run `pnpm typecheck`, `pnpm test run` and `pnpm build:package`.
-4. If a published package changed, run `pnpm changeset` and describe the change.
-5. Open a pull request. CI runs the same checks.
-
-### Releases
-
-Releases use [changesets](https://github.com/changesets/changesets) and only happen when a PR includes a changeset file (`.changeset/*.md`, created with `pnpm changeset`):
-
-1. Merge a PR with a changeset into `main`. A "Version Packages" PR opens, bumping the version and updating the changelog.
-2. Merge the "Version Packages" PR. The new version is published to npm.
-
-PRs without a changeset (docs, CI, Storybook) don't release anything.
-
-Please follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
+Contributions are welcome. Bug reports, ideas and pull requests all help. See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to make changes and how releases work.
 
 ## License
 
