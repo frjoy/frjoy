@@ -8,26 +8,33 @@ on:
 
 jobs:
   test:
-    name: Release
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js 20.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
+        uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
           version: 10
 
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
       - name: Install Dependencies
-        run: pnpm -r install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
 
       - name: Test
-        run: pnpm test
+        run: pnpm test run
         env:
           FORCE_COLOR: true
           VITE_CJS_IGNORE_WARNING: true
+
+      - name: Build
+        run: pnpm build:package

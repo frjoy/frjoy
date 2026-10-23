@@ -13,19 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js 20.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
+        uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
           version: 10
 
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
       - name: Install Dependencies
-        run: pnpm -r install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm test run
 
       - name: Creating .npmrc
         run: |
@@ -39,7 +43,6 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          #publishs
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GHB_TOKEN }}
