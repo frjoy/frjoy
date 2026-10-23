@@ -1,5 +1,5 @@
 import React from "react";
-import { isAlphaNumeric, isInputComplete, isNumber } from "./helpers";
+import { isAllowed, isInputComplete, normalizeDigits } from "./helpers";
 import { OtpContext, useOtpContext } from "./context";
 import { OTPInputClass } from "./controller";
 
@@ -22,10 +22,13 @@ function Input(props: InputProps) {
     onChange,
     onKeyDown,
     onPaste: ps,
+    onClick,
     ...rest
   } = props;
   const {
     addRef,
+    removeRef,
+    onInputClick,
     password,
     type = "any",
     onInputChange,
@@ -34,6 +37,14 @@ function Input(props: InputProps) {
     handleKeyDown,
     pattern,
   } = useOtpContext();
+  const inputId = OTP_UNIQUE_PREFIX_ID + id;
+  const ref = React.useCallback(
+    (el: HTMLInputElement | null) => {
+      if (el) addRef(el);
+      else removeRef(inputId);
+    },
+    [addRef, removeRef, inputId]
+  );
   return (
     <input
       {...rest}
@@ -50,12 +61,17 @@ function Input(props: InputProps) {
         onPaste(e);
         ps && ps(e);
       }}
-      value={otp[OTP_UNIQUE_PREFIX_ID + id] || ""}
+      onClick={(e) => {
+        onInputClick(e);
+        onClick && onClick(e);
+      }}
+      value={otp[inputId] || ""}
       pattern={rest.pattern ?? pattern}
-      id={OTP_UNIQUE_PREFIX_ID + id}
-      ref={(el) => addRef(el!)}
+      id={inputId}
+      ref={ref}
       type={pass || password ? "password" : "text"}
-      autoComplete="off"
+      inputMode={rest.inputMode ?? (type === "number" ? "numeric" : undefined)}
+      autoComplete="one-time-code"
       maxLength={length}
       minLength={length}
     />
@@ -130,13 +146,39 @@ function Root({
     refs.findInputById(currentId)?.prev?.value?.focus();
   };
 
+  // spread text over inputs starting at id, then focus where typing continues
+  const fill = (id: string, text: string) => {
+    let node = refs.findInputById(id);
+    let last = node;
+    const newData = { ...otp };
+
+    while (node && text.length > 0) {
+      const input = node.value!;
+      const maxLength = input.maxLength || 1;
+      newData[input.id] = text.substring(0, maxLength);
+      text = text.substring(maxLength);
+      last = node;
+      node = node.next;
+    }
+    setOtp(newData);
+
+    const input = last?.value;
+    if (!input) return;
+    const complete = isInputComplete(
+      newData[input.id].length,
+      input.maxLength || 1
+    );
+    (complete && last?.next?.value ? last.next.value : input).focus();
+  };
+
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maxLength = e.target.maxLength || 1;
     const id = e.target.id;
-    const value = e.target.value;
-    if (e.target?.dataset.type === "number" && !isNumber(value)) return;
-    if (e.currentTarget?.dataset.type === "text" && !isAlphaNumeric(value))
-      return;
+    const value = normalizeDigits(e.target.value);
+    if (!isAllowed(value, e.target.dataset.type)) return;
+
+    // autofill can drop the whole code into one input
+    if (value.length > maxLength) return fill(id, value);
 
     // if value have changed, update state
     if (otp[id] !== value) setOtp((prev) => ({ ...prev, [id]: value }));
@@ -149,80 +191,78 @@ function Root({
     const id = e.currentTarget.id;
 
     if (e.key === "Backspace") {
-      const stateValue = otp;
-      stateValue[id] =
-        stateValue[id]?.substring(0, stateValue[id]?.length) || "";
-
-      if (!stateValue[id]) {
-        goToPrevInput(id);
-      }
-
+      if (!otp[id]) goToPrevInput(id);
       return;
     }
 
+    const rtl = getComputedStyle(e.currentTarget).direction === "rtl";
+
     if (e.key === "ArrowLeft") {
-      return goToPrevInput(id);
+      return rtl ? goToNextInput(id) : goToPrevInput(id);
     }
 
     if (e.key === "ArrowRight") {
-      return goToNextInput(id);
+      return rtl ? goToPrevInput(id) : goToNextInput(id);
     }
+
+    const key = normalizeDigits(e.key);
 
     // replace current value for input that accepts one character
     if (
       maxLength === 1 &&
-      e.key.length === 1 &&
+      key.length === 1 &&
       Boolean(e.currentTarget.value)
     ) {
-      if (e.currentTarget?.dataset.type === "number" && !isNumber(e.key))
-        return;
-      if (e.currentTarget?.dataset.type === "text" && !isAlphaNumeric(e.key))
-        return;
+      if (!isAllowed(key, e.currentTarget.dataset.type)) return;
 
-      e.key != otp[id] && setOtp((prev) => ({ ...prev, [id]: e.key }));
+      key != otp[id] && setOtp((prev) => ({ ...prev, [id]: key }));
       goToNextInput(id);
     }
   };
 
   const onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    let paste = e.clipboardData.getData("text");
-    const isValid =
-    e.currentTarget?.dataset.type === "number"
-      ? [...paste].every((ch) => isNumber(ch))
-      : e.currentTarget?.dataset.type === "text"
-        ? [...paste].every((ch) => isAlphaNumeric(ch))
-        : true;
+    const paste = normalizeDigits(e.clipboardData.getData("text")).replace(
+      /\s/g,
+      ""
+    );
+    if (!isAllowed(paste, e.currentTarget.dataset.type)) return;
+    fill(e.currentTarget.id, paste);
+  };
 
-    if (!isValid) return;
-
-    let current = refs.findInputById(e.currentTarget.id);
-    const newData = { ...otp };
-
-    while (current && paste.length > 0) {
-      const maxLength = current.value?.maxLength || 1;
-      const id = current.value?.id || "";
-
-      // remove string from 0 to maxLength from paste and add it to newData
-      newData[id] = paste.substring(0, maxLength);
-      paste = paste.substring(maxLength);
-
-      // if input is complete, move to next input
-      if (isInputComplete(newData[id].length, maxLength)) {
-        goToNextInput(id);
-      }
-
-      // move to next input
-      current = current.next;
+  // clicking an empty input jumps to the first one that isn't full
+  const onInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    const current = e.currentTarget;
+    if (current.value) return;
+    for (let n = refs.head; n && n.value !== current; n = n.next) {
+      const input = n.value!;
+      if (input.value.length < (input.maxLength || 1)) return input.focus();
     }
-    setOtp(newData);
   };
 
-  const value = Object.values(otp).join(joiner);
+  const value = refs
+    .ids()
+    .filter((id) => id in otp)
+    .map((id) => otp[id])
+    .join(joiner);
 
-  const addRef = (ref: HTMLInputElement) => {
-    Boolean(ref) && refs.addInput(ref);
-  };
+  const addRef = React.useCallback(
+    (ref: HTMLInputElement) => refs.addInput(ref),
+    [refs]
+  );
+
+  const removeRef = React.useCallback(
+    (id: string) => {
+      refs.removeInput(id);
+      setOtp((prev) => {
+        if (!(id in prev)) return prev;
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    },
+    [refs]
+  );
 
   React.useEffect(() => {
     // If this is the first render, we don't want to trigger onChange
@@ -238,6 +278,8 @@ function Root({
     <OtpContext.Provider
       value={{
         addRef,
+        removeRef,
+        onInputClick,
         onInputChange,
         handleKeyDown,
         onPaste,

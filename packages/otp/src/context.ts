@@ -4,6 +4,8 @@ import { OTPInputClass } from "./controller";
 interface OtpContextProps {
   refs: OTPInputClass;
   addRef: (ref: HTMLInputElement) => void;
+  removeRef: (id: string) => void;
+  onInputClick: (e: React.MouseEvent<HTMLInputElement>) => void;
   otp: { [id: string]: string };
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
