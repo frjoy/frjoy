@@ -10,7 +10,7 @@
     "clean": "rm -rf dist && rm -rf node_modules && find . -type d -name '__snapshots__' -exec rm -rf {} +"
   },
   "dependencies": {
-    "@frjoy/otp": "^0.1.4",
+    "@frjoy/otp": "workspace:*",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"
