@@ -53,7 +53,6 @@ import * as OTP from '@frjoy/otp';
 | Prop | Data Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
 | children | React.ReactNode | - | - | Add custom children to the root element |
-| style | React.CSSProperties | - | - | Add custom style to the root element |
 | pattern | string | - | - | Add custom pattern to all the inputs elements under the `root` make sure that type is `any`|
 | joiner | string | '' | - | Add custom joiner to join all the input value |
 | onChange | (e: string) => void | - | - | Return value in all input joined by default `joiner` you set |
