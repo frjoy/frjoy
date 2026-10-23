@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev:storybook": "pnpm storybook",
-    "dev": "pnpm --filter templates dev",
+    "dev": "pnpm build:package && pnpm --filter templates dev",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "vitest",
