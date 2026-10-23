@@ -23,19 +23,42 @@ export class OTPInputClass {
 
   // Method to add a new input element
   addInput(input: HTMLInputElement): void {
+    if (this.findInputById(input.id)) return;
     const newNode = new Node(input);
 
-    if (this.head === null) {
-      this.head = newNode;
-      this.tail = newNode;
-    } else if (!this.findInputById(input?.id)) {
-      if (this.tail) {
-        newNode.prev = this.tail;
-        this.tail.next = newNode;
-        this.tail = newNode;
-      }
-      this.length++;
+    // insert before the first input that comes after it in the document
+    let after = this.head;
+    while (
+      after &&
+      !(after.value!.compareDocumentPosition(input) &
+        input.DOCUMENT_POSITION_PRECEDING)
+    ) {
+      after = after.next;
     }
+
+    newNode.next = after;
+    newNode.prev = after ? after.prev : this.tail;
+    if (newNode.prev) newNode.prev.next = newNode;
+    else this.head = newNode;
+    if (after) after.prev = newNode;
+    else this.tail = newNode;
+    this.length++;
+  }
+
+  removeInput(id: string): void {
+    const node = this.findInputById(id);
+    if (!node) return;
+    if (node.prev) node.prev.next = node.next;
+    else this.head = node.next;
+    if (node.next) node.next.prev = node.prev;
+    else this.tail = node.prev;
+    this.length--;
+  }
+
+  ids(): string[] {
+    const ids: string[] = [];
+    for (let n = this.head; n; n = n.next) ids.push(n.value?.id ?? "");
+    return ids;
   }
 
   clearAllInputs(): void {

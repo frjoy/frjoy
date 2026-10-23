@@ -1,8 +1,10 @@
 import React from "react";
-import { describe, expect, vitest, test } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, vitest, test } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 import { Root, Input, Label } from "./Otp";
+
+afterEach(cleanup);
 
 describe("OTP Component", () => {
   test("should render the OTP component", async () => {
@@ -159,5 +161,191 @@ describe("OTP Component", () => {
     );
 
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  test("value follows input order, not typing order", async () => {
+    const fn = vitest.fn();
+    render(
+      <Root onChange={fn}>
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.change(inputs[2], { target: { value: "3" } });
+    fireEvent.change(inputs[0], { target: { value: "1" } });
+    fireEvent.change(inputs[1], { target: { value: "2" } });
+    expect(fn).toHaveBeenLastCalledWith("123");
+  });
+
+  test("accepts leading zero in multi-character numeric input", async () => {
+    const fn = vitest.fn();
+    render(
+      <Root type="number" onChange={fn}>
+        <Input length={3} />
+        <Input length={3} />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.change(inputs[0], { target: { value: "01" } });
+    expect(inputs[0].value).toBe("01");
+    expect(fn).toHaveBeenLastCalledWith("01");
+  });
+
+  test("converts Arabic-Indic and Persian digits when typing", async () => {
+    const fn = vitest.fn();
+    render(
+      <Root type="number" onChange={fn}>
+        <Input />
+        <Input />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.change(inputs[0], { target: { value: "\u0663" } });
+    fireEvent.change(inputs[1], { target: { value: "\u06F7" } });
+    expect(inputs.map((i) => i.value)).toEqual(["3", "7"]);
+    expect(fn).toHaveBeenLastCalledWith("37");
+  });
+
+  test("converts Arabic-Indic digits and strips whitespace on paste", async () => {
+    const fn = vitest.fn();
+    render(
+      <Root type="number" onChange={fn}>
+        <Input />
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.paste(inputs[0], {
+      clipboardData: { getData: () => " \u0661\u0662 3 4\n" },
+    });
+    expect(inputs.map((i) => i.value)).toEqual(["1", "2", "3", "4"]);
+    expect(fn).toHaveBeenLastCalledWith("1234");
+  });
+
+  test("autofilled full code in one input is spread across inputs", async () => {
+    const fn = vitest.fn();
+    render(
+      <Root onChange={fn}>
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.change(inputs[0], { target: { value: "987" } });
+    expect(inputs.map((i) => i.value)).toEqual(["9", "8", "7"]);
+    expect(fn).toHaveBeenLastCalledWith("987");
+  });
+
+  test("clicking an empty input ahead of the first empty one redirects focus", async () => {
+    render(
+      <Root>
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.change(inputs[0], { target: { value: "1" } });
+    inputs[2].focus();
+    fireEvent.click(inputs[2]);
+    expect(document.activeElement).toBe(inputs[1]);
+  });
+
+  test("clicking a filled input keeps focus there for editing", async () => {
+    render(
+      <Root>
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.change(inputs[0], { target: { value: "1" } });
+    fireEvent.change(inputs[1], { target: { value: "2" } });
+    inputs[1].focus();
+    fireEvent.click(inputs[1]);
+    expect(document.activeElement).toBe(inputs[1]);
+  });
+
+  test("unmounted inputs leave the value and focus chain", async () => {
+    const fn = vitest.fn();
+    const Form = ({ show }: { show: boolean }) => (
+      <Root onChange={fn}>
+        <Input placeholder="a" />
+        {show && <Input placeholder="b" />}
+        <Input placeholder="c" />
+      </Root>
+    );
+    const { rerender } = render(<Form show />);
+    fireEvent.change(screen.getByPlaceholderText("b"), { target: { value: "2" } });
+    rerender(<Form show={false} />);
+    fireEvent.change(screen.getByPlaceholderText("a"), { target: { value: "1" } });
+    expect(fn).toHaveBeenLastCalledWith("1");
+    expect(document.activeElement).toBe(screen.getByPlaceholderText("c"));
+  });
+
+  test("inputs mounted later keep document order", async () => {
+    const fn = vitest.fn();
+    const Form = ({ show }: { show: boolean }) => (
+      <Root onChange={fn}>
+        <Input placeholder="a" />
+        {show && <Input placeholder="b" />}
+        <Input placeholder="c" />
+      </Root>
+    );
+    const { rerender } = render(<Form show={false} />);
+    rerender(<Form show />);
+    fireEvent.change(screen.getByPlaceholderText("c"), { target: { value: "3" } });
+    fireEvent.change(screen.getByPlaceholderText("b"), { target: { value: "2" } });
+    fireEvent.change(screen.getByPlaceholderText("a"), { target: { value: "1" } });
+    expect(fn).toHaveBeenLastCalledWith("123");
+  });
+
+  test("sets one-time-code autocomplete and numeric keyboard", async () => {
+    render(
+      <Root type="number">
+        <Input />
+      </Root>
+    );
+    const input = (await screen.findByRole("textbox")) as HTMLInputElement;
+    expect(input.getAttribute("autocomplete")).toBe("one-time-code");
+    expect(input.getAttribute("inputmode")).toBe("numeric");
+  });
+
+  // jsdom does not inherit direction, the browser suite covers dir="rtl"
+  test("arrow keys follow visual direction in RTL", async () => {
+    render(
+      <Root>
+        <Input style={{ direction: "rtl" }} />
+        <Input style={{ direction: "rtl" }} />
+        <Input style={{ direction: "rtl" }} />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    inputs[1].focus();
+    fireEvent.keyDown(inputs[1], { key: "ArrowLeft" });
+    expect(document.activeElement).toBe(inputs[2]);
+    fireEvent.keyDown(inputs[2], { key: "ArrowRight" });
+    expect(document.activeElement).toBe(inputs[1]);
+  });
+
+  test("overwrites a filled input with an Arabic-Indic digit key", async () => {
+    const fn = vitest.fn();
+    render(
+      <Root type="number" onChange={fn}>
+        <Input />
+        <Input />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.change(inputs[0], { target: { value: "1" } });
+    fireEvent.keyDown(inputs[0], { key: "\u0669" });
+    expect(inputs[0].value).toBe("9");
+    expect(fn).toHaveBeenLastCalledWith("9");
   });
 });

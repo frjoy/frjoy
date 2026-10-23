@@ -70,3 +70,41 @@ It also accepts the following props
 | --- | --- | --- | --- | --- |
 | length | number | 1 | - | Define the number of character that a user can type in an input |
 | password | boolean | false | - | Define if the input should be a password field |
+
+### Requirements
+
+React 18 or newer.
+
+### Behaviour
+
+- Inputs use `autocomplete="one-time-code"`, so iOS and Android can offer the code from an SMS. A full code filled into one input is spread across all inputs.
+- With `type="number"` the inputs open the numeric keyboard on mobile.
+- Arabic-Indic (`٠-٩`) and Persian (`۰-۹`) digits are converted to `0-9`.
+- Whitespace in pasted codes is ignored.
+- Clicking an empty input moves focus to the first input that isn't filled yet. Filled inputs can still be clicked and edited.
+
+### Accessibility
+
+Give each input a label in your own language:
+
+```jsx
+<OTP.Input aria-label="Digit 1 of 4" />
+```
+
+### Right-to-left languages
+
+OTP codes are read left to right, even in Arabic or Hebrew. Wrap the inputs in an element with `dir="ltr"` so the code doesn't appear reversed:
+
+```jsx
+<OTP.Root>
+  <OTP.Label>رمز التحقق</OTP.Label>
+  <div dir="ltr">
+    <OTP.Input />
+    <OTP.Input />
+    <OTP.Input />
+    <OTP.Input />
+  </div>
+</OTP.Root>
+```
+
+Arrow keys follow the visual direction either way.
