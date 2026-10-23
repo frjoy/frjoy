@@ -47,7 +47,14 @@ Contributions are welcome. Bug reports, ideas and pull requests all help.
 4. If a published package changed, run `pnpm changeset` and describe the change.
 5. Open a pull request. CI runs the same checks.
 
-Releases are automated: merging to `main` opens a "Version Packages" PR, and merging that publishes to npm.
+### Releases
+
+Releases use [changesets](https://github.com/changesets/changesets) and only happen when a PR includes a changeset file (`.changeset/*.md`, created with `pnpm changeset`):
+
+1. Merge a PR with a changeset into `main`. A "Version Packages" PR opens, bumping the version and updating the changelog.
+2. Merge the "Version Packages" PR. The new version is published to npm.
+
+PRs without a changeset (docs, CI, Storybook) don't release anything.
 
 Please follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
