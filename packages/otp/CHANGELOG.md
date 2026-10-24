@@ -1,5 +1,11 @@
 # @frjoy/otp
 
+## 0.2.1
+
+### Patch Changes
+
+- e5bb0ad: Fix typing over a filled input also typing the same character into the next empty input (changing `12` to `19` gave `199`).
+
 ## 0.2.0
 
 ### Minor Changes
