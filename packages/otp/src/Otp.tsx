@@ -215,6 +215,8 @@ function Root({
     ) {
       if (!isAllowed(key, e.currentTarget.dataset.type)) return;
 
+      // handled here, or the browser types it again into the next input
+      e.preventDefault();
       key != otp[id] && setOtp((prev) => ({ ...prev, [id]: key }));
       goToNextInput(id);
     }
