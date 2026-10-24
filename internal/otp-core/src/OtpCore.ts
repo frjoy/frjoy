@@ -113,7 +113,8 @@ export class OtpCore {
   paste(e: PasteLike) {
     e.preventDefault();
     const text = normalizeDigits(e.clipboardData?.getData("text") ?? "").replace(/\s/g, "");
-    if (!this.allowed(text)) return;
+    // nothing usable, e.g. an image or only spaces
+    if (!text || !this.allowed(text)) return;
     this.fill((e.currentTarget as HTMLInputElement).id, text);
   }
 

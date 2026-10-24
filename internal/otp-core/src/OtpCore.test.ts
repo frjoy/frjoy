@@ -82,6 +82,19 @@ test("paste spreads the code, ignoring spaces, and converts Arabic digits", () =
   expect(onChange).toHaveBeenLastCalledWith("123456");
 });
 
+test("pasting nothing usable is ignored", () => {
+  const { core, inputs, onChange } = setup();
+  for (const text of ["", "   "]) {
+    const e = {
+      clipboardData: { getData: () => text } as unknown as DataTransfer,
+      currentTarget: inputs[0],
+      preventDefault: vi.fn(),
+    };
+    expect(() => core.paste(e)).not.toThrow();
+  }
+  expect(onChange).not.toHaveBeenCalled();
+});
+
 test("autofill of the whole code into one input is spread", () => {
   const { inputs, onChange, type } = setup();
   type(inputs[0], "9876");
