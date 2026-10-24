@@ -348,4 +348,20 @@ describe("OTP Component", () => {
     expect(inputs[0].value).toBe("9");
     expect(fn).toHaveBeenLastCalledWith("9");
   });
+
+  test("typing over a filled input does not also type into the next one", async () => {
+    const fn = vitest.fn();
+    render(
+      <Root onChange={fn} type="number">
+        <Input />
+        <Input />
+        <Input />
+      </Root>
+    );
+    const inputs = (await screen.findAllByRole("textbox")) as HTMLInputElement[];
+    fireEvent.change(inputs[0], { target: { value: "1" } });
+    // false means the browser was told not to insert the key itself
+    expect(fireEvent.keyDown(inputs[0], { key: "9" })).toBe(false);
+    expect(fn).toHaveBeenLastCalledWith("9");
+  });
 });
