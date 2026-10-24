@@ -75,7 +75,7 @@ importers:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@20.19.2)(jsdom@24.1.3)(lightningcss@1.30.1)
 
-  internal/otp-core: {}
+  core/otp: {}
 
   packages/otp:
     dependencies:
@@ -94,7 +94,7 @@ importers:
     devDependencies:
       '@frjoy/otp-core':
         specifier: workspace:*
-        version: link:../../internal/otp-core
+        version: link:../../core/otp
 
   templates:
     dependencies:
