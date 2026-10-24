@@ -75,6 +75,8 @@ importers:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@20.19.2)(jsdom@24.1.3)(lightningcss@1.30.1)
 
+  internal/otp-core: {}
+
   packages/otp:
     dependencies:
       '@types/react':
@@ -89,6 +91,10 @@ importers:
       react-dom:
         specifier: ^18.0 || ^19.0
         version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@frjoy/otp-core':
+        specifier: workspace:*
+        version: link:../../internal/otp-core
 
   templates:
     dependencies:

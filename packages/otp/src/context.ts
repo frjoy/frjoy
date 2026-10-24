@@ -1,17 +1,10 @@
 import React from "react";
-import { OTPInputClass } from "./controller";
+import type { OtpCore, OtpType } from "@frjoy/otp-core";
 
 interface OtpContextProps {
-  refs: OTPInputClass;
-  addRef: (ref: HTMLInputElement) => void;
-  removeRef: (id: string) => void;
-  onInputClick: (e: React.MouseEvent<HTMLInputElement>) => void;
-  otp: { [id: string]: string };
-  handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onPaste: (e: React.ClipboardEvent<HTMLInputElement>) => void;
+  core: OtpCore;
   password?: boolean;
-  type: "text" | "number" | "any";
+  type: OtpType;
   pattern?: string;
 }
 

@@ -22,6 +22,18 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "targets": {
+    "main": {
+      "includeNodeModules": [
+        "@frjoy/otp-core"
+      ]
+    },
+    "module": {
+      "includeNodeModules": [
+        "@frjoy/otp-core"
+      ]
+    }
+  },
   "scripts": {
     "clean": "rm -rf dist && rm -rf node_modules && find . -type d -name '__snapshots__' -exec rm -rf {} +",
     "version": "pnpm version"
@@ -34,6 +46,9 @@
   ],
   "author": "Felix Dusengimana <info@feldux.com>",
   "license": "MIT",
+  "devDependencies": {
+    "@frjoy/otp-core": "workspace:*"
+  },
   "peerDependencies": {
     "@types/react": "*",
     "@types/react-dom": "*",
